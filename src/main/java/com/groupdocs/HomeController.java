@@ -5,14 +5,8 @@ import com.groupdocs.annotation.config.ServiceConfiguration;
 import com.groupdocs.annotation.domain.AccessRights;
 import com.groupdocs.annotation.handler.AnnotationHandler;
 import com.groupdocs.annotation.handler.GroupDocsAnnotation;
-import com.groupdocs.annotation.utils.Utils;
 import com.groupdocs.config.ApplicationConfig;
 import com.groupdocs.viewer.domain.*;
-import java.awt.*;
-import java.io.IOException;
-import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,6 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.TimeZone;
 
 /**
  * @author liosha, imy
@@ -43,6 +44,7 @@ public class HomeController extends GroupDocsAnnotation {
     @RequestMapping(value = "/view", method = RequestMethod.GET)
     public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "fileId", required = false) String fileId, @RequestParam(value = "fileUrl", required = false) String fileUrl, @RequestParam(value = "filePath", required = false) String filePath, @RequestParam(value = "tokenId", required = false) String tokenId, @RequestParam(value = "userName", required = false) final String userName) throws Exception {
         if (annotationHandler == null) {
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Vilnius"));
             // Application path
             String appPath = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
             // File storage path
@@ -50,9 +52,7 @@ public class HomeController extends GroupDocsAnnotation {
             // File license path
             String licensePath = applicationConfig.getLicensePath();
             // INITIALIZE GroupDocs Java Annotation Object
-            ServiceConfiguration config = new ServiceConfiguration(appPath,
-                    basePath, licensePath, Boolean.FALSE,
-                    applicationConfig.getWidth());
+            ServiceConfiguration config = new ServiceConfiguration(appPath, basePath, licensePath, Boolean.FALSE, applicationConfig.getWidth());
             annotationHandler = new AnnotationHandler(config);
 //            InputDataHandler.setInputDataHandler(new CustomInputDataHandler(config));
         }
