@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by liosha on 23.01.14.
+ * @author liosha, imy
  */
 public class CustomInputDataHandler extends InputDataHandler {
     private HashMap<String, String> fileId2FilePath = new HashMap<String, String>();
@@ -37,8 +37,9 @@ public class CustomInputDataHandler extends InputDataHandler {
     @Override
     public InputStream getFile(String guid) {
         try {
-            return new FileInputStream(fileId2FilePath.get(guid));
-        } catch (Exception e){
+            // check if guid is a path to the temporary export file
+            return new FileInputStream(guid.contains(".") ? guid : fileId2FilePath.get(guid));
+        } catch (FileNotFoundException e){
             return null;
         }
     }

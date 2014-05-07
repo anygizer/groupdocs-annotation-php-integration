@@ -5,9 +5,14 @@ import com.groupdocs.annotation.config.ServiceConfiguration;
 import com.groupdocs.annotation.domain.AccessRights;
 import com.groupdocs.annotation.handler.AnnotationHandler;
 import com.groupdocs.annotation.handler.GroupDocsAnnotation;
+import com.groupdocs.annotation.utils.Utils;
 import com.groupdocs.config.ApplicationConfig;
 import com.groupdocs.viewer.domain.*;
-import org.apache.commons.lang.StringUtils;
+import java.awt.*;
+import java.io.IOException;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,17 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.io.IOException;
-import java.util.HashMap;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * User: liosha
- * Date: 05.12.13
- * Time: 22:54
+ * @author liosha, imy
  */
 @Controller
 public class HomeController extends GroupDocsAnnotation {
@@ -39,7 +37,7 @@ public class HomeController extends GroupDocsAnnotation {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "userName", required = false) String userName) throws Exception {
-        return index(model, request, response, null, null, "/files/GroupDocs_Demo.doc", null, userName);
+        return index(model, request, response, null, null, "files/GroupDocs_Demo.doc", null, userName);
     }
 
     @RequestMapping(value = "/view", method = RequestMethod.GET)
@@ -52,9 +50,11 @@ public class HomeController extends GroupDocsAnnotation {
             // File license path
             String licensePath = applicationConfig.getLicensePath();
             // INITIALIZE GroupDocs Java Annotation Object
-            ServiceConfiguration config = new ServiceConfiguration(appPath, basePath, licensePath, Boolean.FALSE);
+            ServiceConfiguration config = new ServiceConfiguration(appPath,
+                    basePath, licensePath, Boolean.FALSE,
+                    applicationConfig.getWidth());
             annotationHandler = new AnnotationHandler(config);
-            // InputDataHandler.setInputDataHandler(new CustomInputDataHandler(config));
+//            InputDataHandler.setInputDataHandler(new CustomInputDataHandler(config));
         }
         // Setting header in jsp page
         model.addAttribute("groupdocsHeader", annotationHandler.getHeader());
@@ -124,6 +124,21 @@ public class HomeController extends GroupDocsAnnotation {
         model.addAttribute("height", applicationConfig.getHeight()); // It is for sample JSP (index.jsp)
 
         return "index";
+    }
+
+    @RequestMapping(value = "/getIds", method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8")
+    public @ResponseBody String getIds(
+            @RequestParam(value = "un", required = false) String userName,
+            @RequestParam(value = "fp", required = false) String filePath,
+            HttpServletResponse response) {
+        String usedUserName = userName == null ? "Anonymous" : userName;
+        final GroupDocsPath groupDocsFilePath =
+                new FilePath(filePath, annotationHandler.getConfiguration());
+        String userGuid = annotationHandler.addCollaborator(usedUserName,
+                groupDocsFilePath.getPath(),
+                AccessRights.All, getIntFromColor(Color.black));
+        return "{\"userGuid\":\"" + userGuid + "\", \"fileGuid\":\"" + groupDocsFilePath.getPath() + "\"}";
     }
 
     /**
