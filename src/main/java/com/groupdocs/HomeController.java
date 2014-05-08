@@ -36,13 +36,7 @@ public class HomeController extends GroupDocsAnnotation {
     protected ApplicationConfig applicationConfig;
     protected AnnotationHandler annotationHandler = null;
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "userName", required = false) String userName) throws Exception {
-        return index(model, request, response, null, null, "files/GroupDocs_Demo.doc", null, userName);
-    }
-
-    @RequestMapping(value = "/view", method = RequestMethod.GET)
-    public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "fileId", required = false) String fileId, @RequestParam(value = "fileUrl", required = false) String fileUrl, @RequestParam(value = "filePath", required = false) String filePath, @RequestParam(value = "tokenId", required = false) String tokenId, @RequestParam(value = "userName", required = false) final String userName) throws Exception {
+    protected AnnotationHandler getAnnotationHandler(HttpServletRequest request) throws Exception {
         if (annotationHandler == null) {
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Vilnius"));
             // Application path
@@ -56,6 +50,17 @@ public class HomeController extends GroupDocsAnnotation {
             annotationHandler = new AnnotationHandler(config);
 //            InputDataHandler.setInputDataHandler(new CustomInputDataHandler(config));
         }
+        return annotationHandler;
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "userName", required = false) String userName) throws Exception {
+        return index(model, request, response, null, null, "files/GroupDocs_Demo.doc", null, userName);
+    }
+
+    @RequestMapping(value = "/view", method = RequestMethod.GET)
+    public String index(Model model, HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "fileId", required = false) String fileId, @RequestParam(value = "fileUrl", required = false) String fileUrl, @RequestParam(value = "filePath", required = false) String filePath, @RequestParam(value = "tokenId", required = false) String tokenId, @RequestParam(value = "userName", required = false) final String userName) throws Exception {
+        annotationHandler = getAnnotationHandler(request);
         // Setting header in jsp page
         model.addAttribute("groupdocsHeader", annotationHandler.getHeader());
         // Initialization of Viewer with document from this path
@@ -129,9 +134,11 @@ public class HomeController extends GroupDocsAnnotation {
     @RequestMapping(value = "/getIds", method = RequestMethod.POST,
             produces = "application/json;charset=UTF-8")
     public @ResponseBody String getIds(
+            HttpServletRequest request,
+            HttpServletResponse response,
             @RequestParam(value = "un", required = false) String userName,
-            @RequestParam(value = "fp", required = false) String filePath,
-            HttpServletResponse response) {
+            @RequestParam(value = "fp", required = false) String filePath) throws Exception {
+        annotationHandler = getAnnotationHandler(request);
         String usedUserName = userName == null ? "Anonymous" : userName;
         final GroupDocsPath groupDocsFilePath =
                 new FilePath(filePath, annotationHandler.getConfiguration());
