@@ -98,7 +98,7 @@ public class HomeController extends GroupDocsAnnotation {
             put("zoomToFitHeight",                      "false");           // Default value: false
             put("initialZoom",                          "100");             // Default value: 100
             put("preloadPagesCount",                    "0");               // Default value: 0
-            put("enableSidePanel",                      "true");            // Default value: true
+            put("enableSidePanel",                      "false");            // Default value: true
             put("strikeOutColor",                       "");                // Default value: empty string
             put("enabledTools",                         "255");             // Default value: 255
             put("saveReplyOnFocusLoss",                 "false");           // Default value: false
@@ -108,7 +108,7 @@ public class HomeController extends GroupDocsAnnotation {
             put("textSelectionSynchronousCalculation",  "true");            // Default value: true
             put("variableHeightPageSupport",            "true");            // Default value: true
             put("useJavaScriptDocumentDescription",     "true");            // Default value: true
-            put("isRightPanelEnabled",                  "true");            // Default value: true
+            put("isRightPanelEnabled",                  "false");            // Default value: true
             put("createMarkup",                         "true");            // Default value: true
             put("use_pdf",                              "true");            // Default value: true
             put("_mode",                                "annotatedDocument");           // Default value: annotatedDocument
